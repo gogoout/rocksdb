@@ -1,5 +1,60 @@
 # Changelog
 
+## [5.2.0] - 2021-11-09
+
+### Changed
+
+### Added
+
+### Removed
+
+### Fixed
+
+### Uncategorized
+
+- build(package.json):update repo url ([`db8c37c`](https://github.com/gogoout/rocksdb/commit/db8c37c)) (gogoout)
+- build/change name space ([`1d11b0d`](https://github.com/gogoout/rocksdb/commit/1d11b0d)) (gogoout)
+- 5.2.0 ([`3084dbf`](https://github.com/gogoout/rocksdb/commit/3084dbf)) (gogoout)
+- Bump electron devDependency from 14.x to 15.x ([#182](https://github.com/gogoout/rocksdb/issues/182)) ([`45f39a4`](https://github.com/gogoout/rocksdb/commit/45f39a4)) (dependabot[bot])
+- Add `db.getMany(keys)` ([`17d4116`](https://github.com/gogoout/rocksdb/commit/17d4116)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`50dc50b`](https://github.com/Level/leveldown/commit/50dc50bf005c70b024fe4d3add369b236c8dcbb9))
+- Refactor: add Entry struct to abstract away key-value pairs ([`0c1f8d8`](https://github.com/gogoout/rocksdb/commit/0c1f8d8)) (Vincent Weevers).
+
+  And add `const` and `private` where appropriate.
+
+  (cherry picked from commit [Level/leveldown@`576d135`](https://github.com/Level/leveldown/commit/576d1355ac07d012c584aa42c98f893c5256573f))
+- Optimize `db.iterator()` ([`db7060d`](https://github.com/gogoout/rocksdb/commit/db7060d)) (Vincent Weevers).
+
+  By using `emplace_back()`, reusing the `std::vector` cache between
+  `iterator.next()` calls, and not advancing the iterator prematurely.
+  That last one only matters for single reads (i.e. the first `next()`
+  call or one made after seeking) and it doesn't improve performance
+  compared to the previous release, just undoes a mistake in [Level/leveldown@`b815bea`](https://github.com/Level/leveldown/commit/b815bea).
+
+  (cherry picked from commit [Level/leveldown@`112906b`](https://github.com/Level/leveldown/commit/112906b36be181e587a0b8f72a0584ff6e38e378))
+- Cleanup hanging iterator also when `next()` errored ([`8d6906e`](https://github.com/gogoout/rocksdb/commit/8d6906e)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`7356ba4`](https://github.com/Level/leveldown/commit/7356ba43d3f7261c9b871e947d219e78586ccef2))
+- Refactor: avoid storing `napi_env` ([`ea19d08`](https://github.com/gogoout/rocksdb/commit/ea19d08)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`0f88586`](https://github.com/Level/leveldown/commit/0f88586656e10a140bb7953e2469cb68cd9a9fba))
+- Prevent GC of db during `clear()` and other operations ([`c79f5ab`](https://github.com/gogoout/rocksdb/commit/c79f5ab)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`9a3f59a`](https://github.com/Level/leveldown/commit/9a3f59aede9a6356efc13c8e8b31f6592b7aa64b))
+- Make `db.clear()` 27x faster by doing it natively ([`e44d3a5`](https://github.com/gogoout/rocksdb/commit/e44d3a5)) (Vincent Weevers).
+
+  Because this uses an iterator under the hood, it also refactors
+  shared code between `db.iterator()` and `db.clear()`.
+
+  (cherry picked from commit [Level/leveldown@`aedf49e`](https://github.com/Level/leveldown/commit/aedf49e3bce8bf99d0710809cb859d7243e429a2))
+- Refactor: move CheckEndCallback to Iterator ([`07316be`](https://github.com/gogoout/rocksdb/commit/07316be)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`d3453fb`](https://github.com/Level/leveldown/commit/d3453fbde4d2a8aa04d9091101c25c999649069b))
+- Close database on environment exit ([`7b409c5`](https://github.com/gogoout/rocksdb/commit/7b409c5)) (Vincent Weevers).
+
+  (cherry picked from commit [Level/leveldown@`8fdcaaa`](https://github.com/Level/leveldown/commit/8fdcaaa3bdadec3a2badf8bf13db28fbbfa9a93c))
+
 ## [5.1.1] - 2021-09-28
 
 ### Fixed
@@ -232,6 +287,8 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md)._
 ## [1.0.0] - 2017-07-01
 
 _Earlier versions were published before `v1.0.0` but the code was then a branch inside [`leveldown`](https://github.com/Level/leveldown). This version marks the point where that code was extracted into its own repository thanks to the work of [`@mcollina`](https://github.com/mcollina)._
+
+[5.2.0]: https://github.com/gogoout/rocksdb/compare/v5.1.1...v5.2.0
 
 [5.1.1]: https://github.com/Level/rocksdb/compare/v5.1.0...v5.1.1
 
