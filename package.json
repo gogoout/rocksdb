@@ -1,5 +1,5 @@
 {
-  "name": "rocksdb",
+  "name": "@gogoout/rocksdb",
   "version": "5.2.0",
   "description": "A low-level Node.js RocksDB binding",
   "license": "MIT",
