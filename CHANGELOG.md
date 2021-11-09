@@ -3,22 +3,7 @@
 ## [5.2.0] - 2021-11-09
 
 ### Changed
-
-### Added
-
-### Removed
-
-### Fixed
-
-### Uncategorized
-
-- build(package.json):update repo url ([`db8c37c`](https://github.com/gogoout/rocksdb/commit/db8c37c)) (gogoout)
-- build/change name space ([`1d11b0d`](https://github.com/gogoout/rocksdb/commit/1d11b0d)) (gogoout)
-- 5.2.0 ([`3084dbf`](https://github.com/gogoout/rocksdb/commit/3084dbf)) (gogoout)
 - Bump electron devDependency from 14.x to 15.x ([#182](https://github.com/gogoout/rocksdb/issues/182)) ([`45f39a4`](https://github.com/gogoout/rocksdb/commit/45f39a4)) (dependabot[bot])
-- Add `db.getMany(keys)` ([`17d4116`](https://github.com/gogoout/rocksdb/commit/17d4116)) (Vincent Weevers).
-
-  (cherry picked from commit [Level/leveldown@`50dc50b`](https://github.com/Level/leveldown/commit/50dc50bf005c70b024fe4d3add369b236c8dcbb9))
 - Refactor: add Entry struct to abstract away key-value pairs ([`0c1f8d8`](https://github.com/gogoout/rocksdb/commit/0c1f8d8)) (Vincent Weevers).
 
   And add `const` and `private` where appropriate.
@@ -36,6 +21,10 @@
 - Cleanup hanging iterator also when `next()` errored ([`8d6906e`](https://github.com/gogoout/rocksdb/commit/8d6906e)) (Vincent Weevers).
 
   (cherry picked from commit [Level/leveldown@`7356ba4`](https://github.com/Level/leveldown/commit/7356ba43d3f7261c9b871e947d219e78586ccef2))
+
+### Added
+- Add `db.getMany(keys)` ([`17d4116`](https://github.com/gogoout/rocksdb/commit/17d4116)) (Vincent Weevers).
+  (cherry picked from commit [Level/leveldown@`50dc50b`](https://github.com/Level/leveldown/commit/50dc50bf005c70b024fe4d3add369b236c8dcbb9))
 - Refactor: avoid storing `napi_env` ([`ea19d08`](https://github.com/gogoout/rocksdb/commit/ea19d08)) (Vincent Weevers).
 
   (cherry picked from commit [Level/leveldown@`0f88586`](https://github.com/Level/leveldown/commit/0f88586656e10a140bb7953e2469cb68cd9a9fba))
