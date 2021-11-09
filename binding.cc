@@ -467,7 +467,8 @@ struct Database {
       currentIteratorId_(0),
       pendingCloseWorker_(NULL),
       ref_(NULL),
-      priorityWork_(0) {}
+      priorityWork_(0),
+      isSecondary_(false) {},
 
   ~Database () {
     if (db_ != NULL) {
@@ -478,9 +479,15 @@ struct Database {
 
   leveldb::Status Open (const leveldb::Options& options,
                         bool readOnly,
-                        const char* location) {
+                        bool secondary,
+                        const char* location,
+                        const char* secondaryLocation
+                        ) {
     if (readOnly) {
       return rocksdb::DB::OpenForReadOnly(options, location, &db_);
+    } else if(secondary) {
+      isSecondary_(true);
+      return rocksdb::DB::OpenAsSecondary(options, location, secondaryLocation, &db_);
     } else {
       return leveldb::DB::Open(options, location, &db_);
     }
@@ -568,6 +575,12 @@ struct Database {
     return priorityWork_ > 0;
   }
 
+  void TryCatchUpWithPrimary () {
+    if(isSecondary_){
+      db_->TryCatchUpWithPrimary();
+    }
+  }
+
   leveldb::DB* db_;
   uint32_t currentIteratorId_;
   BaseWorker *pendingCloseWorker_;
@@ -576,6 +589,7 @@ struct Database {
 
 private:
   uint32_t priorityWork_;
+  bool isSecondary_;
 };
 
 /**
@@ -617,6 +631,7 @@ struct BaseIterator {
       gte_(gte),
       limit_(limit),
       count_(0) {
+    database_->TryCatchUpWithPrimary();
     options_ = new leveldb::ReadOptions();
     options_->fill_cache = fillCache;
     options_->verify_checksums = false;
@@ -956,10 +971,14 @@ struct OpenWorker final : public BaseWorker {
               const uint32_t maxFileSize,
               const uint32_t cacheSize,
               const std::string& infoLogLevel,
-              const bool readOnly)
+              const bool readOnly,
+              const bool secondary,
+              const std::string& secondaryLocation)
     : BaseWorker(env, database, callback, "leveldown.db.open"),
       readOnly_(readOnly),
-      location_(location) {
+      location_(location),
+      secondary_(secondary),
+      secondaryLocation_(secondaryLocation) {
     options_.create_if_missing = createIfMissing;
     options_.error_if_exists = errorIfExists;
     options_.compression = compression
@@ -1009,12 +1028,14 @@ struct OpenWorker final : public BaseWorker {
   ~OpenWorker () {}
 
   void DoExecute () override {
-    SetStatus(database_->Open(options_, readOnly_, location_.c_str()));
+    SetStatus(database_->Open(options_, readOnly_, secondary_, location_.c_str(), secondaryLocation_.c_str()));
   }
 
   leveldb::Options options_;
   bool readOnly_;
+  bool secondary_;
   std::string location_;
+  std::string secondaryLocation_;
 };
 
 /**
@@ -1030,6 +1051,8 @@ NAPI_METHOD(db_open) {
   const bool errorIfExists = BooleanProperty(env, options, "errorIfExists", false);
   const bool compression = BooleanProperty(env, options, "compression", true);
   bool readOnly = BooleanProperty(env, options, "readOnly", false);
+  bool secondary = BooleanProperty(env, options, "secondary", false);
+  const std::string secondaryLocation = StringProperty(env, options, "secondaryLocation");
 
   const std::string infoLogLevel = StringProperty(env, options, "infoLogLevel");
 
@@ -1047,7 +1070,7 @@ NAPI_METHOD(db_open) {
                                       compression, writeBufferSize, blockSize,
                                       maxOpenFiles, blockRestartInterval,
                                       maxFileSize, cacheSize,
-                                      infoLogLevel, readOnly);
+                                      infoLogLevel, readOnly, secondary, secondaryLocation);
   worker->Queue(env);
   delete [] location;
 
@@ -1164,6 +1187,7 @@ struct GetWorker final : public PriorityWorker {
     : PriorityWorker(env, database, callback, "leveldown.db.get"),
       key_(key),
       asBuffer_(asBuffer) {
+    database_->TryCatchUpWithPrimary();
     options_.fill_cache = fillCache;
   }
 
@@ -1221,6 +1245,7 @@ struct GetManyWorker final : public PriorityWorker {
                  const bool fillCache)
     : PriorityWorker(env, database, callback, "leveldown.get.many"),
       keys_(keys), valueAsBuffer_(valueAsBuffer) {
+      database_->TryCatchUpWithPrimary();
       options_.fill_cache = fillCache;
       options_.snapshot = database->NewSnapshot();
     }
