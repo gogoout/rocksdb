@@ -468,7 +468,7 @@ struct Database {
       pendingCloseWorker_(NULL),
       ref_(NULL),
       priorityWork_(0),
-      isSecondary_(false) {},
+      isSecondary_(false) {}
 
   ~Database () {
     if (db_ != NULL) {
