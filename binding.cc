@@ -486,7 +486,7 @@ struct Database {
     if (readOnly) {
       return rocksdb::DB::OpenForReadOnly(options, location, &db_);
     } else if(secondary) {
-      isSecondary_(true);
+      isSecondary_ = true;
       return rocksdb::DB::OpenAsSecondary(options, location, secondaryLocation, &db_);
     } else {
       return leveldb::DB::Open(options, location, &db_);
